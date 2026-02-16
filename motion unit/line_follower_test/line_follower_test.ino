@@ -38,19 +38,23 @@ void loop() {
   float line_position = get_line_pos();
   if (line_position == -999) {
     Serial.println("No line is found");
-    drive_left_motor_at(0, 20, 1);
-    drive_right_motor_at(0, 20, 1);
-  } else if (line_position > 0) {
-    int left_pwm = int(base_pwm * left_pwm_normalizer);
-    int right_pwm = int((base_pwm + 2 * line_position * line_position * line_position) * right_pwm_normalizer);
-    drive_left_motor_at(left_pwm, 1, 1);
-    drive_right_motor_at(right_pwm, 1, 1);
+    drive_left_motor_at(0, 10, 10);
+    drive_right_motor_at(0, 10, 10);
+
+  } else if (line_position > 1.5) {
+    drive_left_motor_at(70, 10, 10);
+    drive_right_motor_at(-70, 10, 10);
+    // drive_left_motor_at(0, 1, 255);
+    // drive_right_motor_at(0, 1, 255);
+
+  } else if (line_position < -1.5) {
+    drive_left_motor_at(-70, 10, 10);
+    drive_right_motor_at(70, 10, 10);
+    // drive_left_motor_at(0, 1, 255);
+    // drive_right_motor_at(0, 1, 255);
   } else {
-    line_position = -line_position;
-    int left_pwm = int((base_pwm + 2 * line_position * line_position * line_position) * left_pwm_normalizer);
-    int right_pwm = int(base_pwm * right_pwm_normalizer);
-    drive_left_motor_at(left_pwm, 1, 1);
-    drive_right_motor_at(right_pwm, 1, 1);
+    drive_left_motor_at(70, 10, 10);
+    drive_right_motor_at(70, 10, 10);
   }
 }
 
@@ -104,7 +108,7 @@ void drive_right_motor_at(int pwm_val, int update_period_ms, uint8_t delta_pwm_p
   } else if (delta_actual_pwm > delta_pwm_per_period) {
     delta_actual_pwm = delta_pwm_per_period;
   }
-  actual_pwm = actual_pwm + delta_actual_pwm;
+  actual_pwm = int((actual_pwm + delta_actual_pwm) * right_pwm_normalizer);
 
   //------------
 
@@ -130,7 +134,7 @@ void drive_left_motor_at(int pwm_val, int update_period_ms, uint8_t delta_pwm_pe
   } else if (delta_actual_pwm > delta_pwm_per_period) {
     delta_actual_pwm = delta_pwm_per_period;
   }
-  actual_pwm = actual_pwm + delta_actual_pwm;
+  actual_pwm = int((actual_pwm + delta_actual_pwm) * left_pwm_normalizer);
 
   //-------------
   if (actual_pwm < 0) {  //go reverse
